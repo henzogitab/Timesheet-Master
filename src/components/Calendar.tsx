@@ -140,7 +140,7 @@ const Calendar: React.FC<Props> = ({
         onClick={() => !isInert && onDayClick(date)}
         className={`group min-h-[110px] p-2 border border-slate-100 transition-all relative flex flex-col
           ${getTileStyle(effectiveCausal, holiday)}
-          cursor-pointer overflow-visible z-0 hover:z-10
+          cursor-pointer overflow-visible z-0 hover:z-20
         `}
       >
         <div className="flex justify-between items-start">
@@ -161,19 +161,12 @@ const Calendar: React.FC<Props> = ({
               </div>
             )}
 
+            {/* Icona Nota: aumentata dimensione e rimossa logica tooltip locale */}
             {entry?.notes && (
-              <div className="relative group/note z-20">
-                <MessageSquareText
-                  size={14}
-                  className="text-slate-400 fill-slate-100"
-                />
-                <div className="hidden group-hover/note:block absolute right-0 top-5 w-48 bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-xl z-50 pointer-events-none">
-                  <p className="font-bold border-b border-slate-600 pb-1 mb-1 uppercase tracking-wider text-[9px]">
-                    Nota
-                  </p>
-                  {entry.notes}
-                </div>
-              </div>
+              <MessageSquareText
+                size={20}
+                className="text-slate-400 fill-slate-100"
+              />
             )}
 
             {errors.length > 0 && (
@@ -240,6 +233,16 @@ const Calendar: React.FC<Props> = ({
           <span className="text-[9px] text-red-600 font-black mt-auto uppercase italic">
             Festa
           </span>
+        )}
+
+        {/* TOOLTIP NOTA: Visibile su hover intero tile (group-hover) */}
+        {entry?.notes && (
+          <div className="hidden group-hover:block absolute right-2 top-9 z-[60] w-48 bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-2xl pointer-events-none animate-in fade-in zoom-in-95 duration-200 border border-slate-700">
+            <p className="font-bold border-b border-slate-600 pb-1 mb-1 uppercase tracking-wider text-[9px] flex items-center gap-2">
+              <MessageSquareText size={12} /> Nota
+            </p>
+            <p className="leading-relaxed">{entry.notes}</p>
+          </div>
         )}
       </div>
     );

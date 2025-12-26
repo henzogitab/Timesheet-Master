@@ -266,7 +266,10 @@ export const calculatePresenceInPeriod = (
         presence += 1;
       } else if (causal === "PSTU") {
         const stats = calculateDayStats(current, entry, settings, overrides);
-        presence += stats.workedMinutes / stats.targetMinutes;
+        const target = stats.targetMinutes > 0 ? stats.targetMinutes : 360;
+        const deduction = (entry?.permessoMinutes || 0) / target;
+        // La presenza è 1 (il giorno intero) meno la frazione di assenza
+        presence += Math.max(0, 1 - deduction);
       }
     }
     current.setDate(current.getDate() + 1);
