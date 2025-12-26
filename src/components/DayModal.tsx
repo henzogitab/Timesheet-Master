@@ -21,6 +21,7 @@ import {
   ArrowRightLeft,
   Calendar as CalendarIcon,
   Info,
+  Send,
 } from "lucide-react";
 
 interface Props {
@@ -79,6 +80,9 @@ const DayModal: React.FC<Props> = ({
       : "00:00"
   );
   const [notes, setNotes] = useState(entry?.notes || "");
+  const [springRequest, setSpringRequest] = useState(
+    entry?.springRequest || false
+  );
   const [error, setError] = useState<string | null>(null);
 
   // Stato per lo scambio della lunga
@@ -88,6 +92,15 @@ const DayModal: React.FC<Props> = ({
     if (!entry) {
       if (causal === "Smart" || causal === "Ufficio") {
         setEnd(isLong ? "17:00" : "13:30");
+      }
+      // Reset spring request if changing causal to Office/Smart
+      if (causal === "Ufficio" || causal === "Smart") {
+        setSpringRequest(false);
+      }
+    } else {
+      // Se modifico un'entry esistente, se passo a Ufficio/Smart resetto spring
+      if (causal === "Ufficio" || causal === "Smart") {
+        setSpringRequest(false);
       }
     }
   }, [causal, isLong, entry]);
@@ -142,6 +155,8 @@ const DayModal: React.FC<Props> = ({
       endTime: end,
       permessoMinutes: (ph || 0) * 60 + (pm || 0),
       notes,
+      springRequest:
+        causal !== "Ufficio" && causal !== "Smart" ? springRequest : false,
     });
   };
 
@@ -395,6 +410,59 @@ const DayModal: React.FC<Props> = ({
                       <span className="text-sm font-black tracking-tight">
                         Per coprire il target suggeriamo le {expectedExit}
                       </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* SWITCH SPRING (Solo se non Ufficio/Smart) */}
+              {causal !== "Ufficio" && causal !== "Smart" && (
+                <div className="space-y-6">
+                  <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-2">
+                    <div className="w-1 h-3 bg-indigo-500 rounded-full"></div>{" "}
+                    Richiesta Gestionale
+                  </label>
+                  <div
+                    onClick={() => setSpringRequest(!springRequest)}
+                    className={`cursor-pointer p-4 rounded-3xl border transition-all flex items-center justify-between group
+                      ${
+                        springRequest
+                          ? "bg-white border-indigo-200 shadow-md"
+                          : "bg-white/50 border-slate-200 hover:bg-white"
+                      }
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-2.5 rounded-2xl transition-colors ${
+                          springRequest
+                            ? "bg-indigo-600 text-white"
+                            : "bg-slate-100 text-slate-400"
+                        }`}
+                      >
+                        <Send size={18} />
+                      </div>
+                      <div>
+                        <div
+                          className={`text-xs font-black uppercase tracking-wide ${
+                            springRequest ? "text-indigo-900" : "text-slate-500"
+                          }`}
+                        >
+                          Richiesto su Spring
+                        </div>
+                        <div className="text-[9px] font-bold text-slate-400 uppercase">
+                          Segnala l'avvenuta richiesta ufficiale
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      className={`w-12 h-7 rounded-full p-1 transition-colors flex items-center ${
+                        springRequest
+                          ? "bg-indigo-600 justify-end"
+                          : "bg-slate-200 justify-start"
+                      }`}
+                    >
+                      <div className="w-5 h-5 bg-white rounded-full shadow-sm"></div>
                     </div>
                   </div>
                 </div>

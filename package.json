@@ -1,8 +1,12 @@
 {
-  "name": "Timesheet Master",
+  "name": "timesheet-master",
   "version": "1.0.0",
-  "description": "A comprehensive work attendance and timesheet management application designed with specific Italian labor regulations, Smart Working limits, and automated meal voucher (Buoni Pasto) calculations.",
-  "keywords": ["typescript", "react", "starter"],
+  "description": "A comprehensive work attendance and timesheet management application designed with specific Italian labor regulations.",
+  "keywords": [
+    "typescript",
+    "react",
+    "starter"
+  ],
   "main": "src/index.tsx",
   "dependencies": {
     "loader-utils": "3.2.1",
@@ -25,5 +29,10 @@
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

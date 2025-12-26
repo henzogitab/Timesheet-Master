@@ -55,6 +55,7 @@ export interface DailyEntry {
   endTime: string; // HH:mm
   permessoMinutes: number;
   notes?: string;
+  springRequest?: boolean; // Richiesto su gestionale HR
 }
 
 export interface DayStats {
