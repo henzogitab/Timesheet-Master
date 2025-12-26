@@ -7,7 +7,12 @@ import {
   minutesToTime,
   formatDateISO,
 } from "../utils/calculations";
-import { ChevronLeft, ChevronRight, AlertCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  MessageSquareText,
+} from "lucide-react";
 
 interface Props {
   state: AppState;
@@ -74,6 +79,27 @@ const Calendar: React.FC<Props> = ({
     }
   };
 
+  const getBadgeStyle = (causal?: string) => {
+    switch (causal) {
+      case "Smart":
+      case "Ferie":
+      case "FS":
+        return "text-green-700 bg-green-200/50";
+      case "104":
+      case "Art.25":
+      case "PSTU":
+      case "PESA":
+        return "text-blue-700 bg-blue-200/50";
+      case "Malattia":
+      case "Art.26":
+        return "text-rose-700 bg-rose-200/50";
+      case "Ufficio":
+        return "text-slate-600 bg-slate-200/50 border border-slate-300 shadow-sm";
+      default:
+        return "text-slate-600 bg-slate-200/50";
+    }
+  };
+
   const renderDay = (day: number) => {
     const date = new Date(
       currentMonth.getFullYear(),
@@ -106,13 +132,15 @@ const Calendar: React.FC<Props> = ({
         : undefined;
     const isInert = holiday || effectiveCausal === "Festa";
 
+    const badgeStyle = getBadgeStyle(effectiveCausal);
+
     return (
       <div
         key={day}
         onClick={() => !isInert && onDayClick(date)}
         className={`group min-h-[110px] p-2 border border-slate-100 transition-all relative flex flex-col
           ${getTileStyle(effectiveCausal, holiday)}
-          cursor-pointer
+          cursor-pointer overflow-visible z-0 hover:z-10
         `}
       >
         <div className="flex justify-between items-start">
@@ -125,52 +153,65 @@ const Calendar: React.FC<Props> = ({
           >
             {day}
           </span>
-          {errors.length > 0 && (
-            <div className="relative">
-              <AlertCircle size={16} className="text-red-600 animate-pulse" />
-              <div className="hidden group-hover:block absolute z-50 right-0 top-6 w-48 bg-red-600 text-white text-[10px] p-2 rounded shadow-xl pointer-events-none">
-                {errors.map((err, idx) => (
-                  <p
-                    key={idx}
-                    className="mb-1 last:mb-0 border-b border-red-400 pb-1 last:border-0"
-                  >
-                    • {err}
-                  </p>
-                ))}
+
+          <div className="flex items-center gap-1 absolute top-2 right-2">
+            {state.dayOverrides && state.dayOverrides[dateStr] && (
+              <div className="text-[7px] font-black text-indigo-500 bg-indigo-50 px-1 rounded border border-indigo-200">
+                SCAMBIO
               </div>
-            </div>
-          )}
-          {state.dayOverrides && state.dayOverrides[dateStr] && (
-            <div className="absolute top-1 right-5 text-[8px] font-black text-indigo-500 bg-indigo-50 px-1 rounded border border-indigo-200">
-              SCAMBIATO
-            </div>
-          )}
+            )}
+
+            {entry?.notes && (
+              <div className="relative group/note z-20">
+                <MessageSquareText
+                  size={14}
+                  className="text-slate-400 fill-slate-100"
+                />
+                <div className="hidden group-hover/note:block absolute right-0 top-5 w-48 bg-slate-800 text-white text-[10px] p-3 rounded-xl shadow-xl z-50 pointer-events-none">
+                  <p className="font-bold border-b border-slate-600 pb-1 mb-1 uppercase tracking-wider text-[9px]">
+                    Nota
+                  </p>
+                  {entry.notes}
+                </div>
+              </div>
+            )}
+
+            {errors.length > 0 && (
+              <div className="relative group/error z-20">
+                <AlertCircle size={16} className="text-red-600 animate-pulse" />
+                <div className="hidden group-hover/error:block absolute right-0 top-5 w-48 bg-red-600 text-white text-[10px] p-2 rounded shadow-xl pointer-events-none z-50">
+                  {errors.map((err, idx) => (
+                    <p
+                      key={idx}
+                      className="mb-1 last:mb-0 border-b border-red-400 pb-1 last:border-0"
+                    >
+                      • {err}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         {displayTag && (
           <div className="mt-1 space-y-1">
             <div
-              className={`text-[9px] px-1.5 py-0.5 rounded-full inline-block font-extrabold uppercase truncate max-w-full
-              ${
-                displayTag === "Smart" ||
-                displayTag === "Ferie" ||
-                displayTag === "FS"
-                  ? "text-green-700 bg-green-200/50"
-                  : displayTag === "104" ||
-                    displayTag === "Art.25" ||
-                    displayTag === "PSTU" ||
-                    displayTag === "PESA"
-                  ? "text-blue-700 bg-blue-200/50"
-                  : displayTag === "Malattia" || displayTag === "Art.26"
-                  ? "text-rose-700 bg-rose-200/50"
-                  : displayTag === "Ufficio"
-                  ? "text-slate-600 bg-slate-200/50 border border-slate-300 shadow-sm"
-                  : "text-slate-600 bg-slate-200/50"
-              }
-            `}
+              className={`text-[9px] px-1.5 py-0.5 rounded-full inline-block font-extrabold uppercase truncate max-w-full ${badgeStyle}`}
             >
               {displayTag === "FS" ? "Festività Sopp." : displayTag}
             </div>
+
+            {/* SPRING BADGE */}
+            {entry?.springRequest &&
+              effectiveCausal !== "Ufficio" &&
+              effectiveCausal !== "Smart" && (
+                <div
+                  className={`text-[7px] px-1.5 py-0.5 rounded-full inline-block font-black uppercase truncate max-w-full ml-1 border border-current opacity-80 ${badgeStyle}`}
+                >
+                  SPRING
+                </div>
+              )}
 
             {displayTag !== "PSTU" &&
               displayTag !== "Ferie" &&
